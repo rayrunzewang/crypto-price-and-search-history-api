@@ -1,0 +1,28 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Serverless Framework
+.serverless/
+
+# Local env
+.env
+.env.*
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage / Tests
+coverage/
+*.test.js.snap
+jest-cache/
+
+# Allow Layer module structure
+!layers/sharedLibs/nodejs/node_modules/
+!layers/sharedLibs/nodejs/node_modules/libs/**

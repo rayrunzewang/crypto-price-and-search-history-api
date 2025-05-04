@@ -1,0 +1,69 @@
+name: Deploy SAM App
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::777575672216:role/GithubActionsDeployRole
+          aws-region: ap-southeast-2
+
+      - name: Set up AWS SAM CLI
+        uses: aws-actions/setup-sam@v2
+
+      - name: Extract version
+        id: get_version
+        run: |
+          VERSION=$(jq -r .version services/email-price-service/package.json)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Clean previous SAM build
+        run: rm -rf .aws-sam
+
+      - name: Install dependencies for shared layer
+        run: npm install
+        working-directory: layers/sharedLibs/nodejs/node_modules/libs
+
+      - name: Install dependencies for email-price-service
+        run: npm install
+        working-directory: services/email-price-service
+
+      - name: Install dependencies for history-service
+        run: npm install
+        working-directory: services/history-service
+
+      - name: Build SAM application
+        run: sam build --use-container
+
+      - name: Debug version and email
+        run: |
+          echo "VERSION=${VERSION}"
+          echo "SOURCE_EMAIL=${{ secrets.SOURCE_EMAIL }}"
+
+      - name: Deploy SAM application
+        env:
+          SOURCE_EMAIL: ${{ secrets.SOURCE_EMAIL }}
+        run: |
+          sam deploy --no-confirm-changeset --force-upload \
+            --stack-name crypto-api \
+            --s3-bucket my-sam-artifacts-sydney \
+            --s3-prefix crypto-api/${VERSION} \
+            --capabilities CAPABILITY_IAM \
+            --region ap-southeast-2 \
+            --parameter-overrides \
+              VersionParam=${VERSION} \
+              SourceEmail=${SOURCE_EMAIL}
