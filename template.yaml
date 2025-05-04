@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Cryptocurrency Email and Search History API
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 10
+    MemorySize: 128
+
+Resources:
+
+  ### DynamoDB Table ###
+  CryptoSearchHistoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: CryptoSearchHistory
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+  ### Lambda 1 - Email Cryptocurrency Price ###
+  EmailCryptoPriceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: EmailCryptoPriceFunction
+      CodeUri: services/email-price-service
+      Handler: handlers/getPriceAndSendEmail.handler
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource: "*"
+      Environment:
+        Variables:
+          TABLE_NAME: CryptoSearchHistory
+          FROM_EMAIL: your_verified_email@example.com
+
+      Events:
+        EmailCryptoAPI:
+          Type: Api
+          Properties:
+            Path: /price
+            Method: POST
+    Metadata:
+      BuildMethod: nodejs18.x
+
+Outputs:
+  EmailCryptoAPIEndpoint:
+    Description: "POST endpoint to request cryptocurrency price by email"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/price"
