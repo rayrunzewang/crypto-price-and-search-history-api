@@ -1,17 +1,19 @@
-import fetchAllSearchRecord from '../service/historyService.js';
+import middy from '@middy/core';
+import httpJsonBodyParser from '@middy/http-json-body-parser';
+import httpErrorHandler from '@middy/http-error-handler';
 
-export const handler = async (event) => {
+import fetchAllSearchRecord from '../service/historyService.js';
+import { successResponse } from 'libs/utils/response.js';
+
+const baseHandler = async (event) => {
   try {
     const history = await fetchAllSearchRecord();
-    return {
-      statusCode: 200,
-      body: JSON.stringify(history),
-    };
+    return successResponse(history);
   } catch (err) {
-    console.error(err);
-    return {
-      statusCode: 500,
-      body: 'Failed to retrieve history.',
-    };
+    throw new Error('Failed to retrieve search history.');
   }
 };
+
+export const handler = middy(baseHandler)
+  .use(httpJsonBodyParser())
+  .use(httpErrorHandler());   

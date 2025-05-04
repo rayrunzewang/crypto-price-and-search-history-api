@@ -25,4 +25,8 @@ jest-cache/
 
 # Allow Layer module structure
 !layers/sharedLibs/nodejs/node_modules/
-!layers/sharedLibs/nodejs/node_modules/libs/**
+layers/sharedLibs/nodejs/node_modules/libs/**
+
+.aws-sam/
+
+build/

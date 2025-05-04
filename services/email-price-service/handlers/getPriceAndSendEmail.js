@@ -6,7 +6,7 @@ import { getCryptoPrice } from '../services/priceService.js';
 import { saveSearch } from '../services/searchRecordService.js';
 import { sendEmail } from '../services/emailService.js';
 
-import { success } from 'libs/utils/response.js';
+import { successResponse } from 'libs/utils/response.js';
 import { errorFormatter } from 'libs/middlewares/errorHandler.js';
 import { BadRequestError } from 'libs/errors/customErrors.js';
 import { isValidEmail, isValidSymbol } from 'libs/utils/validators.js';
@@ -31,7 +31,7 @@ const baseHandler = async (event) => {
   await sendEmail(email, symbol, price);
   await saveSearch({ symbol, email, timestamp: Date.now() });
 
-  return success(
+  return successResponse(
     {},
     `Email sent to ${email} successfully with current price of ${symbol.toUpperCase()}. If you did not receive the email, please check spam box.`
   );
