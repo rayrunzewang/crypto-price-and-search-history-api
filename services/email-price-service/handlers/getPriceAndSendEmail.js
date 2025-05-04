@@ -1,14 +1,15 @@
-import middy from '@middy/core'
-import httpJsonBodyParser from '@middy/http-json-body-parser'
-import httpErrorHandler from '@middy/http-error-handler'
+import middy from '@middy/core';
+import httpJsonBodyParser from '@middy/http-json-body-parser';
+import httpErrorHandler from '@middy/http-error-handler';
 
-import { getCryptoPrice } from '../service/priceService.js'
-import { saveSearch } from '../libs/aws/dynamodb.js'
-import { sendEmail } from '../libs/aws/ses.js';
-import { success } from '../libs/utils/response.js'
-import { errorFormatter } from '../libs/middlewares/errorHandler.js'
-import { BadRequestError } from '../libs/errors/customErrors.js'
-import { isValidEmail, isValidSymbol } from '../libs/utils/validators.js';
+import { getCryptoPrice } from '../services/priceService.js';
+import { saveSearch } from '../services/searchRecordService.js';
+import { sendEmail } from '../services/emailService.js';
+
+import { success } from 'libs/utils/response.js';
+import { errorFormatter } from 'libs/middlewares/errorHandler.js';
+import { BadRequestError } from 'libs/errors/customErrors.js';
+import { isValidEmail, isValidSymbol } from 'libs/utils/validators.js';
 
 
 const baseHandler = async (event) => {

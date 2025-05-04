@@ -1,0 +1,11 @@
+{
+  "name": "history-service",
+  "version": "1.0.1",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.799.0",
+    "@aws-sdk/lib-dynamodb": "^3.799.0",
+    "uuid": "^11.1.0",
+    "winston": "^3.17.0"
+  }
+}

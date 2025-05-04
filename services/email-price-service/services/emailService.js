@@ -1,6 +1,6 @@
 import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
-import logger from '../logger/index.js';
-import { EmailSendError } from '../errors/customErrors.js';
+import logger from 'libs/logger/index.js';
+import { EmailSendError } from 'libs/errors/customErrors.js';
 
 const ses = new SESClient({ region: process.env.REGION_PARAM || 'ap-southeast-2' });
 

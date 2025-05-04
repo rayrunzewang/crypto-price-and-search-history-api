@@ -22,3 +22,7 @@ Thumbs.db
 coverage/
 *.test.js.snap
 jest-cache/
+
+# Allow Layer module structure
+!layers/sharedLibs/nodejs/node_modules/
+!layers/sharedLibs/nodejs/node_modules/libs/**
