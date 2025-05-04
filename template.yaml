@@ -2,6 +2,15 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Cryptocurrency Email and Search History API
 
+Parameters:
+  VersionParam:
+    Type: String
+    Description: Version number from package.json
+
+  SourceEmail:
+    Type: String
+    Description: Email address verified in SES
+
 Globals:
   Function:
     Runtime: nodejs18.x
@@ -39,8 +48,10 @@ Resources:
               Resource: "*"
       Environment:
         Variables:
+          REGION_PARAM: ap-southeast-2
           TABLE_NAME: CryptoSearchHistory
-          FROM_EMAIL: your_verified_email@example.com
+          SOURCE_EMAIL: !Ref SourceEmail
+          VERSION: !Ref VersionParam
 
       Events:
         EmailCryptoAPI:

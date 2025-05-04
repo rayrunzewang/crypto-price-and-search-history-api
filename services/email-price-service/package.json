@@ -1,7 +1,7 @@
 {
   "name": "email-price-service",
-  "version": "1.0.1",
-  "description": "Microservice to fetch current cryptocurrency prices",
+  "version": "1.0.2",
+  "description": "A microservice to fetch and email current cryptocurrency prices, and records user queries in DynamoDB",
   "type": "module",
   "main": "handler.js",
   "dependencies": {

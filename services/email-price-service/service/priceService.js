@@ -1,6 +1,6 @@
 import axios from 'axios'
 import logger from '../libs/logger/index.js'
-import { ExternalAPIError} from '../libs/errors/customErrors.js'
+import { ExternalAPIError } from '../libs/errors/customErrors.js'
 
 export async function getCryptoPrice(symbol) {
     const url = `https://api.coingecko.com/api/v3/simple/price?ids=${symbol}&vs_currencies=usd`
