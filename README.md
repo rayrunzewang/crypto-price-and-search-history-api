@@ -16,13 +16,14 @@ This project implements two serverless microservices using Node.js on AWS:
 * **AWS Lambda**: For deploying the serverless microservices.
 * **AWS API Gateway**: To expose the APIs for interaction.
 * **AWS DynamoDB**: For persisting the search history data.
+* **CloudWatch**: Logging.
 * **AWS SES (Simple Email Service)**: For sending email notifications with cryptocurrency prices. (Since it's using the sandbox mode, the recipient should first verify their email in AWS SES. Also, please note that the email may be sent to the spam folder.)
 * **GitHub Actions**: For Continuous Integration and Continuous Deployment (CI/CD). The deployment is fully automated using AWS SAM, ensuring reproducibility and simplicity in managing the infrastructure.
 * **AWS SAM (Serverless Application Model)**: For infrastructure as code to deploy and manage the serverless resources (Lambda functions, DynamoDB， API Gateway， Lambda Layers, and IAM Policies).
 
 ## Architecture Overview
 
-Lambda Layers to centralize and share reusable configurations and libraries across multiple functions, simplifying maintenance and reducing code duplication.
+Lambda Layers to centralize and share reusable configurations (e.g., validators, middlewares, formatted JSON responses, custom error handling, winston and logging, and DynamoDB settings) and libraries across multiple functions, simplifying maintenance and reducing code duplication.
 
 1. **Microservice 1 (Email Cryptocurrency Price to User)**:
 
@@ -101,7 +102,7 @@ npx vitest run
     }
     ```
 
-    ### **Important Notes**:
+    ### ⚠️ **Important Notes**:
 
     1. **Email Delivery**: 
       - The email with the cryptocurrency price will be sent to the provided email address (Since this is using sandbox mode, the recipient should first verify their email in AWS SES). 
@@ -109,6 +110,51 @@ npx vitest run
       - Also, please note that because I applied for my personal email to be in production mode but it has not yet passed AWS's review, the email may be sent to the spam folder.
 
     2. **Symbol Case Sensitivity**: The cryptocurrency symbol (e.g., `bitcoin`, `ethereum`, etc.) is case-sensitive. Please ensure that you use the correct case when specifying the symbol.
+
+    ### Error Handling
+
+    The API implements basic input validation and returns descriptive error messages for invalid requests. All error responses follow a consistent structure:
+
+    ```json
+    example errors:
+    {
+    "success": false,
+    "message": "Invalid email format"
+    }
+
+    {
+    "success": false,
+    "message": "Price data missing for symbol: xxx"
+    }
+
+    {
+    "success": false,
+    "message": "Missing symbol or email"
+    }
+
+    {
+    "success": false,
+    "message": "Failed to send email"
+    }
+    ```
+
+    ### Common Error Cases
+
+    | HTTP Code | Scenario                                       | Message Example             |
+    | --------- | ---------------------------------------------- | --------------------------- |
+    | 400       | Missing required fields                        | `"Missing symbol or email"` |
+    | 400       | Invalid email format                           | `"Invalid email format"`    |
+    | 400       | Invalid cryptocurrency symbol                  | `"Invalid symbol format"`   |
+    | 500       | Internal server error (e.g. 3rd-party failure) | `"Something went wrong"`    |
+
+    > ⚠️ **Note**: Currently, only a subset of input-related errors is handled. If more time were available, additional error types would be implemented, such as:
+    >
+    > * CoinGecko API failures
+    > * DynamoDB save/query failures
+    > * Email sending errors (e.g., SES quota exceeded)
+    > * etc.
+    
+    > And further standardize the API response format and structure.
 
 2. **Microservice 2: Retrieve Search History**
 
