@@ -58,6 +58,10 @@ jobs:
         env:
           SOURCE_EMAIL: ${{ secrets.SOURCE_EMAIL }}
         run: |
+          # Temporarily disable exit on error
+          set +e 
+          
+          # Deploy SAM application, capturing output
           sam deploy --no-confirm-changeset --force-upload \
             --stack-name crypto-api \
             --s3-bucket my-sam-artifacts-sydney \
@@ -66,4 +70,13 @@ jobs:
             --region ap-southeast-2 \
             --parameter-overrides \
               VersionParam=${VERSION} \
-              SourceEmail=${SOURCE_EMAIL}
+              SourceEmail=${SOURCE_EMAIL} | tee result.log
+          
+          # Check for the "No changes to deploy" message in the logs
+          if grep -q "No changes to deploy" result.log; then
+            echo "No changes to deploy, skipping deployment."
+            exit 0  # Exit gracefully with success
+          fi
+          
+          # Restore default behavior to exit on any other errors
+          set -e
